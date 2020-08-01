@@ -1,5 +1,7 @@
 # LND REST Client
 
+[![npm](https://img.shields.io/npm/v/lnd-rest-client?style=plastic)](https://www.npmjs.com/package/lnd-rest-client)
+
 This project will wrap the entire [LND REST API](https://api.lightning.community/#lnd-rest-api-reference) for use in NodeJS. It is currently under development and accepting contributions.
 
 ## Local Development
