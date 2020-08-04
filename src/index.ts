@@ -27,29 +27,33 @@ export class LndRestClient {
     return response.json();
   }
 
-  async getPaymentRequest(
-    paymentRequest: string
-  ): Promise<{
-    destination: string;
-    payment_hash: string;
-    num_satoshis: string;
-    timestamp: string;
-    expiry: string;
-    description: string;
-    description_hash: string;
-    fallback_addr: string;
-    cltv_expiry: string;
-    route_hints: RouteHint[];
-    payment_addr: string;
-    num_msat: string;
-    features: { [k: string]: { name: string; is_required: boolean; is_known: boolean } };
-  }> {
+  async getPaymentRequest(paymentRequest: string): Promise<GetPaymentRequestResponse> {
     const response = await fetch(`${this.baseUrl}/v1/payreq/${paymentRequest}`, {
       headers: { [LndRestClient.macaroonHeaderKey]: this.macaroons.readonly },
     });
-    return response.json();
+    const data = await response.json();
+    return { ...data, _type: data.error ? 'error' : 'success' };
   }
 }
+
+type GetPaymentRequestResponse =
+  | {
+      _type: 'success';
+      destination: string;
+      payment_hash: string;
+      num_satoshis: string;
+      timestamp: string;
+      expiry: string;
+      description: string;
+      description_hash: string;
+      fallback_addr: string;
+      cltv_expiry: string;
+      route_hints: RouteHint[];
+      payment_addr: string;
+      num_msat: string;
+      features: { [k: string]: { name: string; is_required: boolean; is_known: boolean } };
+    }
+  | { _type: 'error'; error: string; message: string; code: number; details: string[] };
 
 type Hop = {
   amt_to_forward: string;
