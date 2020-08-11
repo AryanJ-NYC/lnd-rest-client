@@ -4,6 +4,33 @@
 
 This project will wrap the entire [LND REST API](https://api.lightning.community/#lnd-rest-api-reference) for use in NodeJS. It is currently under development and accepting contributions.
 
+## Installation
+
+```bash
+npm install lnd-rest-client
+```
+
+or
+
+```bash
+yarn add lnd-rest-client
+```
+
+## Usage
+
+```typescript
+import { LndRestClient } from 'lnd-rest-client';
+
+const lndRestClient = new LndRestClient(baseUrl, {
+  admin: process.env.ADMIN_MACAROON,
+  base: process.env.BASE_MACAROON,
+  invoice: process.env.INVOICE_MACAROON,
+  readonly: process.env.READ_ONLY_MACAROON,
+});
+
+const paymentRequestInfo = await lndRestClient.getPaymentRequest(paymentRequest);
+```
+
 ## Local Development
 
 Below is a list of commands you will probably find useful.
