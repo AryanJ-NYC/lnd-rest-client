@@ -119,7 +119,6 @@ type LightningNode = {
 type NodeAddress = { network: string; addr: string };
 
 type Macaroons = {
-  base: string;
   admin: string;
   invoice: string;
   readonly: string;
