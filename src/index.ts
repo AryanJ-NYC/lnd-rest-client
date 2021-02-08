@@ -13,18 +13,14 @@ export class LndRestClient {
 
   async createChannelsTransaction(body: {
     payment_request: string;
-  }): Promise<{
-    payment_error: string;
-    payment_preimage: string;
-    payment_route: Route;
-    payment_hash: string;
-  }> {
+  }): Promise<CreateChannelsTransactionResponse> {
     const response = await fetch(`${this.baseUrl}/v1/channels/transactions`, {
       body: JSON.stringify(body),
       headers: { [LndRestClient.macaroonHeaderKey]: this.macaroons.admin },
       method: 'POST',
     });
-    return response.json();
+    const data = await response.json();
+    return { ...data, _type: data.error ? 'error' : 'success' };
   }
 
   async getGraphNode(pubKey: string): Promise<GetGraphNodeResponse> {
@@ -46,6 +42,15 @@ export class LndRestClient {
 
 type Error = { _type: 'error'; error: string; message: string; code: number; details: string[] };
 
+type CreateChannelsTransactionResponse =
+  | {
+      _type: 'success';
+      payment_error: string;
+      payment_preimage: string;
+      payment_route: Route;
+      payment_hash: string;
+    }
+  | Error;
 type GetGraphNodeResponse =
   | {
       _type: 'success';
