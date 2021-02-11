@@ -23,6 +23,19 @@ export class LndRestClient {
     return { ...data, _type: data.error ? 'error' : 'success' };
   }
 
+  async createOnChainTransaction(body: {
+    addr: string;
+    amount: string | number;
+  }): Promise<{ _type: 'success'; txid: string } | Error> {
+    const response = await fetch(`${this.baseUrl}/v1/transactions`, {
+      body: JSON.stringify(body),
+      headers: { [LndRestClient.macaroonHeaderKey]: this.macaroons.admin },
+      method: 'POST',
+    });
+    const data = await response.json();
+    return { ...data, _type: data.error ? 'error' : 'success' };
+  }
+
   async getGraphNode(pubKey: string): Promise<GetGraphNodeResponse> {
     const response = await fetch(`${this.baseUrl}/v1/graph/node/${pubKey}`, {
       headers: { [LndRestClient.macaroonHeaderKey]: this.macaroons.readonly },
