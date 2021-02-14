@@ -44,6 +44,14 @@ export class LndRestClient {
     return { ...data, _type: data.error ? 'error' : 'success' };
   }
 
+  async getChannelsBalance(): Promise<GetChannelsBalanceResponse> {
+    const response = await fetch(`${this.baseUrl}/v1/balance/channels`, {
+      headers: { [LndRestClient.macaroonHeaderKey]: this.macaroons.readonly },
+    });
+    const data = await response.json();
+    return { ...data, _type: data.error ? 'error' : 'success' };
+  }
+
   async getGraphNode(pubKey: string): Promise<GetGraphNodeResponse> {
     const response = await fetch(`${this.baseUrl}/v1/graph/node/${pubKey}`, {
       headers: { [LndRestClient.macaroonHeaderKey]: this.macaroons.readonly },
@@ -79,6 +87,13 @@ type GetBlockchainBalanceResponse =
       total_balance: string;
       confirmed_balance: string;
       unconfirmed_balance: string;
+    }
+  | Error;
+
+type GetChannelsBalanceResponse =
+  | {
+      _type: 'success';
+      balance: string;
     }
   | Error;
 
