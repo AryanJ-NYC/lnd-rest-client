@@ -67,6 +67,21 @@ export class LndRestClient {
     const data = await response.json();
     return { ...data, _type: data.error ? 'error' : 'success' };
   }
+
+  async sendPaymentV2(body: {
+    fee_limit_sat?: number;
+    max_parts: number;
+    payment_request: string;
+    timeout_seconds: number;
+  }): Promise<SendPaymentV2Response> {
+    const response = await fetch(`${this.baseUrl}/v2/router/send`, {
+      body: JSON.stringify({ ...body, no_inflight_updates: true }),
+      headers: { [LndRestClient.macaroonHeaderKey]: this.macaroons.admin },
+      method: 'POST',
+    });
+    const { result } = await response.json();
+    return result;
+  }
 }
 
 type Error = { _type: 'error'; error: string; message: string; code: number; details: string[] };
@@ -126,6 +141,24 @@ type GetPaymentRequestResponse =
     }
   | Error;
 
+type SendPaymentV2Response = {
+  _type: 'success';
+  payment_hash: string;
+  value: string;
+  creation_date: string;
+  fee: string;
+  payment_preimage: string;
+  value_sat: string;
+  value_msat: string;
+  payment_request: string;
+  status: LnrpcPaymentStatus;
+  fee_sat: string;
+  fee_msat: string;
+  creation_time_ns: string;
+  payment_index: string;
+  failure_reason: LnrpcPaymentFailureReason;
+};
+
 type ChannelEdge = {
   channel_id: string;
   chan_point: string;
@@ -157,6 +190,16 @@ type HopHint = {
   fee_proportional_millionths: number;
   citv_expiry_delta: number;
 };
+
+type LnrpcPaymentFailureReason =
+  | 'FAILURE_REASON_NONE'
+  | 'FAILURE_REASON_TIMEOUT'
+  | 'FAILURE_REASON_NO_ROUTE'
+  | 'FAILURE_REASON_ERROR'
+  | 'FAILURE_REASON_INCORRECT_PAYMENT_DETAILS'
+  | 'FAILURE_REASON_INSUFFICIENT_BALANCE	';
+
+type LnrpcPaymentStatus = 'UNKNOWN' | 'IN_FLIGHT' | 'SUCCEEDED' | 'FAILED';
 
 type LightningNode = {
   last_update: number;
